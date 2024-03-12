@@ -58,15 +58,16 @@ const useTableData = (defaultRows: User[]) => {
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [toastOpen, setToastOpen] = React.useState(false);
   const [toastMessage, setToastMessage] = React.useState("");
-  const [rows, setRows] = React.useState<User[]>(defaultRows);
-  const [allRows, setAllRows] = React.useState<User[]>(defaultRows);
+  const [rowsData, setRows] = React.useState<User[]>(defaultRows);
+  const [searchedRows, setSearchedRows] = React.useState<User[]>(rowsData);
   const [operationType, setOperationType] = React.useState<"create" | "edit">("create");
   const [selectedValue, setSelectedValue] = React.useState<User | null>(null);
   const [inputValue, setInputValue] = React.useState("");
+  const rows = inputValue.length ? searchedRows : rowsData;
 
   React.useEffect(()=>{
-    setAllRows([...rows])
-  },[rows]) 
+    setSearchedRows([...rowsData])
+  },[rowsData]) 
 
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
@@ -128,13 +129,13 @@ const useTableData = (defaultRows: User[]) => {
         page * rowsPerPage,
         page * rowsPerPage + rowsPerPage,
       ),
-    [order, orderBy, page, rowsPerPage, rows],
+    [order, orderBy, page, rowsPerPage, rowsData, searchedRows],
   );
 
   const totalSalary = React.useMemo(
     () => rows.reduce((sum,cur)=>sum + cur.salary, 0)
      ,
-    [ rows],
+    [rowsData, searchedRows],
   );
 
   const openToast = (message: string) => {
@@ -172,7 +173,7 @@ const useTableData = (defaultRows: User[]) => {
     setRows((rows) => rows.filter((row) => !idMap.has(row.id) ))
     setSelected([])
     openToast("Users deleted")
-  }
+  } 
 
   const openCreateUserDialog = () => {
     setOperationType("create");
@@ -198,10 +199,10 @@ const useTableData = (defaultRows: User[]) => {
   }
 
   const searchUsers = (value: string) => {
-    setRows(allRows.filter((row) => comparator(value, row)))
+    setSearchedRows(rowsData.filter((row) => comparator(value, row)))
   }
 
-  const debounceSearch = React.useCallback(debounce(searchUsers, 300), [])
+  const debounceSearch = React.useCallback(debounce(searchUsers, 300), [rowsData])
 
   const handleSearchChange = (value: string) => {
     setInputValue(value);

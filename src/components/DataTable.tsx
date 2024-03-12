@@ -218,7 +218,7 @@ export default function DataTable() {
       <Box sx={{ width: '100%' }}>
         <FlexBox >
           <TextField
-            label="Search"
+            placeholder='Search name or email'            
             size="small"
             value={inputValue}
             onChange={(e) => handleSearchChange(e.target.value)}
